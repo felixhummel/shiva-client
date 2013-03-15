@@ -15,16 +15,21 @@ MIMES = {
 }
 
 
+def abspath(path):
+    return os.path.join(os.path.dirname(__file__), path)
+
+
 @app.route('/')
 @app.route('/<path:path>')
 def serve(path=DEFAULT_PATH):
     """ Petit flask-based test server for angular-phonecat app """
 
-    if not os.path.exists(path):
+    _path = abspath(path)
+    if not os.path.exists(_path):
         abort(404)
 
-    content = file(path, 'r').read()
-    mimetype = MIMES[path[path.rindex('.') + 1:]]
+    content = file(_path, 'r').read()
+    mimetype = MIMES[_path[_path.rindex('.') + 1:]]
 
     return Response(content, status=200, mimetype=mimetype)
 
@@ -47,5 +52,11 @@ def proxy(path):
     return Response(_request.read(), status=_request.getcode(),
                     mimetype=mimetype)
 
+
+def main():
+    app.run('0.0.0.0', port=9001, debug=False)
+
+
 if __name__ == '__main__':
-    app.run('0.0.0.0', port=9001, debug=True)
+    main()
+
